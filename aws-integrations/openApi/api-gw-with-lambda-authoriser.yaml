@@ -1,0 +1,60 @@
+openapi: 3.0.3
+info:
+  title: ${name}
+  description: ""
+  version: 1.0.0
+servers:
+  - url: 'https'
+    variables:
+      basePath:
+        default: ""
+tags:
+  - name: API
+paths:
+  /api/v1:
+    post:
+      tags:
+        - API
+      summary: "Test"
+      description: ""
+      responses:
+        "200":
+          description: "OK"
+      security:
+        - authoriser: []
+      x-amazon-apigateway-integration:
+        payloadFormatVersion: "2.0"
+        type: aws_proxy
+        httpMethod: POST
+#     uri - is lambda arn what gateway will invoke
+        uri: arn:aws:apigateway:${aws_region}:lambda:path/2015-03-31/functions/arn:aws:lambda:${aws_region}:${aws_account_id}:function:${function_name}/invocations
+        connectionType: INTERNET
+
+components:
+  securitySchemes:
+    authoriser:
+      type: apiKey
+      name: Authorization
+      in: header
+      x-amazon-apigateway-authorizer:
+        identitySource: "$request.header.Authorization"
+        authorizerUri: ${api_gateway_authoriser_invoke_arn}
+        authorizerPayloadFormatVersion: 2.0
+        authorizerResultTtlInSeconds: 300
+        type: request
+        enableSimpleResponses: true
+x-amazon-apigateway-cors:
+  allowMethods:
+  - "DELETE"
+  - "GET"
+  - "HEAD"
+  - "OPTIONS"
+  - "PATCH"
+  - "POST"
+  - "PUT"
+  allowHeaders:
+  - "*"
+  maxAge: 0
+  allowCredentials: false
+  allowOrigins:
+  - "*"
