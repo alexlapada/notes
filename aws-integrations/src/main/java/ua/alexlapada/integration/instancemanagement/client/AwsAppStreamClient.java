@@ -1,10 +1,13 @@
 package ua.alexlapada.integration.instancemanagement.client;
 
+import software.amazon.awssdk.services.appstream.model.DescribeSessionsRequest;
+import software.amazon.awssdk.services.appstream.model.DescribeSessionsResponse;
 import ua.alexlapada.EnvUtil;
 import ua.alexlapada.constant.EnvKeys;
 import ua.alexlapada.exception.AwsClientException;
 import ua.alexlapada.integration.instancemanagement.AwsClientFactory;
 import ua.alexlapada.integration.instancemanagement.AwsInstanceManagementClient;
+import ua.alexlapada.model.AppStreamSession;
 import ua.alexlapada.model.ServiceInstance;
 import ua.alexlapada.transformer.AppStreamInstanceTransformer;
 import lombok.extern.slf4j.Slf4j;
@@ -81,5 +84,32 @@ public class AwsAppStreamClient implements AwsInstanceManagementClient {
                 .stream()
                 .map(AppStreamInstanceTransformer::transform)
                 .collect(Collectors.toList());
+    }
+
+    public List<AppStreamSession> describeSessions(String fleetName, String stackName, String userId) {
+        try {
+            DescribeSessionsRequest request = DescribeSessionsRequest.builder()
+                    .fleetName(fleetName)
+                    .stackName(stackName)
+                    .limit(50)
+                    .userId(userId)
+                    .authenticationType("SAML")
+                    .build();
+            DescribeSessionsResponse response = appStreamClient.describeSessions(request);
+            return response.sessions()
+                    .stream()
+                    .map(session -> AppStreamSession.builder()
+                            .id(session.id())
+                            .state(session.stateAsString())
+                            .connectionState(session.connectionStateAsString())
+                            .authenticationType(session.authenticationTypeAsString())
+                            .fleetName(session.fleetName())
+                            .userId(session.userId())
+                            .stackName(session.stackName())
+                            .build())
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new AwsClientException("Starting instance error.", e);
+        }
     }
 }
