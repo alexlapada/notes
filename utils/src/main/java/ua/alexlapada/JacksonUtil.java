@@ -40,6 +40,10 @@ public class JacksonUtil {
         return jsonMapper.convertValue(content, typeReference);
     }
 
+    public static <T> T read(String content, TypeReference<T> typeReference) throws IOException {
+        return jsonMapper.readValue(content, typeReference);
+    }
+
     public static <T> T readJson(InputStream content, Class<T> clazz) throws IOException {
         return jsonMapper.readValue(content, clazz);
     }
