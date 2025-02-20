@@ -1,5 +1,4 @@
 .idea/*
-!.idea/codeStyles
 .settings
 *.iml
 target

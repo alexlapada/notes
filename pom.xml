@@ -16,6 +16,7 @@
         <module>utils</module>
         <module>hibernate</module>
         <module>aws-jersey-lambda</module>
+        <module>spring</module>
     </modules>
     <properties>
         <commons-lang3.version>3.12.0</commons-lang3.version>
